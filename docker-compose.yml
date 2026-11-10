@@ -1,10 +1,21 @@
-version: "3"
-
+# Low-latency NetISO server for the stock Xbox 360 plugin.
+#
+#   cp .env.example .env          # set NAS_LAN_IP and ISO_DIR
+#   docker compose up -d --build  # first build takes a few minutes on a NAS CPU
+#
+# Host networking skips the Docker bridge and NAT on every read. The server then
+# binds the NAS LAN address itself; the protocol has no authentication, so it is
+# never 0.0.0.0 here. Add "-p" to the command only with a plugin that reads more
+# than 4 KiB per request (see README, "Latency notes").
 services:
   netiso:
-    image: ghcr.io/tuxuser/netiso-srv-rs:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.source
+    image: netiso-srv:low-latency
+    container_name: netiso
+    restart: unless-stopped
+    network_mode: host
+    command: ["/app/netiso-srv", "-r", "-b", "${NAS_LAN_IP:?set NAS_LAN_IP in .env}", "/mnt"]
     volumes:
-      - /x360/games:/mnt
-    ports:
-      # Publish on the NAS address the console talks to, not on every interface.
-      - "${NAS_LAN_IP:?set NAS_LAN_IP to the NAS address the Xbox uses}:4323:4323"
+      - "${ISO_DIR:?set ISO_DIR in .env}:/mnt:ro"

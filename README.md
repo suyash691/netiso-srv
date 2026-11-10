@@ -52,23 +52,22 @@ plugin is changed to larger reads or `ss -ti` shows retransmits.
 
 ## Docker
 
-The container binds `0.0.0.0` on its own network; the port publish is the
-boundary. Publish on the NAS LAN address only, not on all interfaces.
+`docker compose` builds the server from this tree (`Dockerfile.source`) and
+runs it with host networking, bound to the NAS LAN address. The protocol has
+no authentication, so under host networking the bind is never `0.0.0.0`.
 
-Spawn container standalone
 ```
-docker run -p 192.168.1.10:4323:4323 -v /path/to/isos:/mnt ghcr.io/tuxuser/netiso-srv-rs:latest
-```
-
-or
-
-Spawn via docker compose
-```
-NAS_LAN_IP=192.168.1.10 docker compose up
+cp .env.example .env          # set NAS_LAN_IP and ISO_DIR
+docker compose up -d --build  # first build takes a few minutes on a NAS CPU
+docker compose logs -f netiso # ISO list, mounts, disconnects
 ```
 
-For the lowest latency use host networking instead of a published port
-(`--network host`), and then pass `-b <NAS LAN IP>` as the bind address.
+`ghcr.io/tuxuser/netiso-srv-rs:latest` is the stock upstream server without
+these changes. To run it anyway, publish on the NAS LAN address only:
+
+```
+docker run -p 192.168.1.10:4323:4323 -v /path/to/isos:/mnt:ro ghcr.io/tuxuser/netiso-srv-rs:latest
+```
 
 ## Client (Xbox 360 plugin)
 

@@ -29,3 +29,6 @@ client/**/*.sdf
 client/**/*.suo
 client/**/*.opensdf
 client/.vs/
+
+# Local docker compose settings (see .env.example)
+.env

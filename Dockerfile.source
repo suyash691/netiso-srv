@@ -1,0 +1,20 @@
+# Build the server from this source tree, for a NAS or any Docker host:
+#   docker compose up -d --build        (see docker-compose.yml)
+# CI uses ./Dockerfile instead, with a cross-compiled binary copied in.
+
+FROM rust:1-alpine AS build
+RUN apk add --no-cache musl-dev
+WORKDIR /src
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+# musl target: the binary is static, so the runtime image needs nothing else.
+RUN cargo build --release --locked && /src/target/release/netiso-srv -h
+
+FROM alpine:latest
+WORKDIR /app
+COPY --from=build /src/target/release/netiso-srv .
+VOLUME /mnt
+EXPOSE 4323/TCP
+# Wildcard bind inside the container; the port publish decides who can reach it.
+# docker-compose.yml runs with host networking and overrides -b with the NAS LAN IP.
+CMD ["/app/netiso-srv", "-r", "-b", "0.0.0.0", "/mnt"]
