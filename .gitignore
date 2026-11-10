@@ -29,6 +29,8 @@ client/**/*.sdf
 client/**/*.suo
 client/**/*.opensdf
 client/.vs/
+client/build/
+client/**/*.map
 
 # Local docker compose settings (see .env.example)
 .env

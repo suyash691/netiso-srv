@@ -19,11 +19,21 @@ Licensed under the GPL-3.0, see [`LICENSE`](LICENSE).
 
 ## Build
 
-Requires Windows, Visual Studio 2010 and the Microsoft Xbox 360 SDK (XDK),
-which adds the `Xbox 360` platform: the PowerPC compiler and linker,
-`xboxkrnl.lib`, `xapilib.lib`, `xnet.lib`, `libcmt.lib` and `imagexex`. The XDK
-is Microsoft-proprietary and not redistributable, so there is no public CI
-build of this plugin.
+Requires Windows and the Microsoft Xbox 360 SDK (XDK): the PowerPC compiler
+and linker, `xboxkrnl.lib`, `xapilib.lib`, `xnet.lib`, `libcmt.lib` and
+`imagexex`. The XDK is Microsoft-proprietary and not redistributable, so there
+is no public CI build of this plugin.
+
+### Command line
+
+`build_plugin.bat [SDK version]` runs the SDK tools directly, no Visual Studio
+needed. It reads `XEDK` (set by the SDK installer), generates the xkelib import
+libs, compiles, links, runs `imagexex`, and converts to retail with `xextool`
+when that is on `PATH`. The SDK version picks the `.def` files (default
+`21256`). Output: `netiso.xex` beside the script. The script mirrors
+`netiso.vcxproj` but has not been run here.
+
+### Visual Studio 2010
 
 1. Open `isodll.sln`.
 2. Project `xkelib`: choose the configuration matching the installed XDK
